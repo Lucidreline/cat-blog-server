@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { CreateTaskDto } from './dto/create-post.dto';
+import { BlogPost } from './entities/blog-post.entity';
 
 @Injectable()
 export class PostsService {
-  private posts: any = [
+  private posts: BlogPost[] = [
     {
       id: 0,
       imageUrl:
@@ -32,11 +34,26 @@ export class PostsService {
     },
   ];
 
-  findAll() {
+  findAll(): BlogPost[] {
     return this.posts;
   }
 
-  findById(postId: number) {
+  findById(postId: number): BlogPost {
     return this.posts.find((post) => post.id === postId);
+  }
+
+  createPost(post: CreateTaskDto): BlogPost {
+    const { imageUrl } = post;
+    const newPost = {
+      ...post,
+      id: Date.now(),
+      imageUrl: imageUrl
+        ? imageUrl
+        : 'https://images.unsplash.com/photo-1494256997604-768d1f608cac?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1101&q=80',
+      likeCounter: 0,
+    };
+
+    this.posts.push(newPost);
+    return newPost;
   }
 }
