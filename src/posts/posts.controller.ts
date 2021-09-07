@@ -1,5 +1,10 @@
-import { Controller, Get, Param, Body, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, Body, Post, Query } from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateTaskDto } from './dto/create-post.dto';
 import { BlogPost } from './entities/blog-post.entity';
 import { PostsService } from './posts.service';
@@ -8,13 +13,15 @@ import { PostsService } from './posts.service';
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}
-  @ApiCreatedResponse({ type: [BlogPost] })
+
+  @ApiOkResponse({ type: BlogPost, isArray: true })
+  @ApiQuery({ name: 'search', required: false })
   @Get()
-  getPosts(): BlogPost[] {
-    return this.postsService.findAll();
+  getPosts(@Query('search') query: string): BlogPost[] {
+    return this.postsService.findAll(query);
   }
 
-  @ApiCreatedResponse({ type: BlogPost })
+  @ApiOkResponse({ type: BlogPost })
   @Get(':id')
   getPostById(@Param('id') id: string): BlogPost {
     // TODO: have nest do auto parsing

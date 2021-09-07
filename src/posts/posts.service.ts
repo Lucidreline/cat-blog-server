@@ -34,7 +34,15 @@ export class PostsService {
     },
   ];
 
-  findAll(): BlogPost[] {
+  findAll(query?: string): BlogPost[] {
+    if (query)
+      return this.posts.filter(
+        (post) =>
+          post.textBody
+            .toLocaleLowerCase()
+            .includes(query.toLocaleLowerCase()) ||
+          post.title.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
+      );
     return this.posts;
   }
 
