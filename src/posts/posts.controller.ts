@@ -1,6 +1,15 @@
-import { Controller, Get, Param, Body, Post, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Body,
+  Post,
+  Query,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiQuery,
   ApiTags,
@@ -22,10 +31,14 @@ export class PostsController {
   }
 
   @ApiOkResponse({ type: BlogPost })
+  @ApiNotFoundResponse()
   @Get(':id')
   getPostById(@Param('id') id: string): BlogPost {
-    // TODO: have nest do auto parsing
-    return this.postsService.findById(Number(id));
+    const post = this.postsService.findById(Number(id));
+
+    if (!post) throw new NotFoundException();
+
+    return post;
   }
 
   @ApiCreatedResponse({ type: BlogPost })
