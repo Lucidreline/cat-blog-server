@@ -6,8 +6,10 @@ import {
   Post,
   Query,
   NotFoundException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -33,8 +35,8 @@ export class PostsController {
   @ApiOkResponse({ type: BlogPost })
   @ApiNotFoundResponse()
   @Get(':id')
-  getPostById(@Param('id') id: string): BlogPost {
-    const post = this.postsService.findById(Number(id));
+  getPostById(@Param('id', ParseIntPipe) id: number): BlogPost {
+    const post = this.postsService.findById(id);
 
     if (!post) throw new NotFoundException();
 
@@ -42,6 +44,7 @@ export class PostsController {
   }
 
   @ApiCreatedResponse({ type: BlogPost })
+  @ApiBadRequestResponse() // its possible to get a bad responce because we added validation in the dto
   @Post()
   createPost(@Body() body: CreateTaskDto): BlogPost {
     return this.postsService.createPost(body);
