@@ -8,7 +8,7 @@ export class BlogPost {
   @ApiProperty()
   title: string;
   @ApiProperty()
-  description: string;
+  textBody: string;
   @ApiProperty()
   likeCounter: number;
 }

@@ -7,8 +7,8 @@ export class CreateTaskDto {
   title: string;
 
   @ApiProperty()
-  description: string;
+  textBody: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   imageUrl?: string;
 }
