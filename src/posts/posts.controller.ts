@@ -29,8 +29,10 @@ export class PostsController {
   @ApiOkResponse({ type: BlogPost, isArray: true })
   @ApiQuery({ name: 'search', required: false })
   @Get()
-  getPosts(@Query('search') query: string): BlogPost[] {
-    return this.postsService.findAll(query);
+  async getPosts(@Query('search') query: string) {
+    if (query) return await this.postsService.findAll(query);
+
+    return await this.postsService.findAll();
   }
 
   @ApiOkResponse({ type: BlogPost })
@@ -47,8 +49,7 @@ export class PostsController {
   @ApiCreatedResponse({ type: BlogPost })
   @ApiBadRequestResponse() // its possible to get a bad responce because we added validation in the dto
   @Post()
-  async createPost(@Body() body: CreateTaskDto): Promise<BlogPostModel> {
-    const createdPost = await this.postsService.createPost(body);
-    return createdPost;
+  createPost(@Body() body: CreateTaskDto): Promise<BlogPostModel> {
+    return this.postsService.createPost(body);
   }
 }

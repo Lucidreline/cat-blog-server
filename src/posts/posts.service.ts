@@ -47,16 +47,17 @@ export class PostsService {
     },
   ];
 
-  findAll(query?: string): BlogPost[] {
+  async findAll(query?: string): Promise<BlogPostModel[]> {
+    const allBlogPosts = await this.blogPostModel.find();
+
     if (query)
-      return this.posts.filter(
-        (post) =>
-          post.textBody
-            .toLocaleLowerCase()
-            .includes(query.toLocaleLowerCase()) ||
-          post.title.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
+      return allBlogPosts.filter(
+        (blogPost) =>
+          blogPost.textBody.toLowerCase().includes(query.toLowerCase()) ||
+          blogPost.title.toLowerCase().includes(query.toLowerCase()),
       );
-    return this.posts;
+
+    return allBlogPosts;
   }
 
   findById(postId: number): BlogPost {
@@ -64,15 +65,14 @@ export class PostsService {
   }
 
   createPost(post: CreateTaskDto): Promise<BlogPostModel> {
-    let { imageUrl } = post;
-    imageUrl = imageUrl
-      ? imageUrl
-      : 'https://images.unsplash.com/photo-1494256997604-768d1f608cac?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1101&q=80';
+    const { imageUrl } = post;
 
-    post.imageUrl = imageUrl;
+    const defaultImageUrl =
+      'https://images.unsplash.com/photo-1494256997604-768d1f608cac?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1101&q=80';
     const newBlogPost = new this.blogPostModel({
       ...post,
       likeCounter: 0,
+      imageUrl: imageUrl ? imageUrl : defaultImageUrl,
     });
 
     return newBlogPost.save();
