@@ -6,6 +6,8 @@ import {
   Post,
   Query,
   NotFoundException,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -16,9 +18,10 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateTaskDto } from './dto/create-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
 import { BlogPost } from './schemas/post.schema';
 import { PostsService } from './posts.service';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -49,7 +52,19 @@ export class PostsController {
   @ApiCreatedResponse({ type: BlogPost })
   @ApiBadRequestResponse() // its possible to get a bad responce because we added validation in the dto
   @Post()
-  createPost(@Body() body: CreateTaskDto): Promise<BlogPost> {
-    return this.postsService.createPost(body);
+  async createPost(@Body() body: CreatePostDto): Promise<BlogPost> {
+    return await this.postsService.createPost(body);
+  }
+
+  @ApiCreatedResponse({ type: BlogPost })
+  @Patch()
+  patchPost(@Body() body: UpdatePostDto): Promise<BlogPost> {
+    return this.postsService.updatePost(body);
+  }
+
+  @ApiCreatedResponse({ type: BlogPost })
+  @Delete(':id')
+  deletePostById(@Param('id') id: string): Promise<BlogPost> {
+    return this.postsService.deletePostById(id);
   }
 }

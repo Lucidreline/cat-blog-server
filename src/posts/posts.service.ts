@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-post.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreatePostDto } from './dto/create-post.dto';
 
 // mongoose
-import { Model } from 'mongoose';
+import { Model, Types as mongooseTypes } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   BlogPost as BlogPostModel,
   BlogPostDocument,
 } from './schemas/post.schema';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostsService {
@@ -30,10 +31,12 @@ export class PostsService {
   }
 
   findById(postId: string): Promise<BlogPostModel> {
+    if (!mongooseTypes.ObjectId.isValid(postId))
+      throw new BadRequestException();
     return this.blogPostModel.findById(postId).exec();
   }
 
-  createPost(post: CreateTaskDto): Promise<BlogPostModel> {
+  createPost(post: CreatePostDto): Promise<BlogPostModel> {
     const { imageUrl } = post;
 
     const defaultImageUrl =
@@ -45,5 +48,15 @@ export class PostsService {
     });
 
     return newBlogPost.save();
+  }
+
+  updatePost(updatePost: UpdatePostDto): Promise<BlogPostDocument> {
+    return this.blogPostModel
+      .findByIdAndUpdate(updatePost._id, updatePost, { new: true }) // new: true returns the updated blog
+      .exec();
+  }
+
+  deletePostById(postId: string): Promise<BlogPostModel> {
+    return this.blogPostModel.findByIdAndDelete(postId).exec();
   }
 }
