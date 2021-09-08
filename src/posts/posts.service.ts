@@ -2,8 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-post.dto';
 import { BlogPost } from './entities/blog-post.entity';
 
+// mongoose
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import {
+  BlogPost as BlogPostModel,
+  BlogPostDocument,
+} from './schemas/post.schema';
+
 @Injectable()
 export class PostsService {
+  constructor(
+    @InjectModel(BlogPostModel.name)
+    private blogPostModel: Model<BlogPostDocument>,
+  ) {}
+
   private posts: BlogPost[] = [
     {
       id: 0,
