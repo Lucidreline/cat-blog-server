@@ -18,6 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateTaskDto } from './dto/create-post.dto';
 import { BlogPost } from './entities/blog-post.entity';
+import { BlogPost as BlogPostModel } from './schemas/post.schema';
 import { PostsService } from './posts.service';
 
 @ApiTags('Posts')
@@ -46,7 +47,8 @@ export class PostsController {
   @ApiCreatedResponse({ type: BlogPost })
   @ApiBadRequestResponse() // its possible to get a bad responce because we added validation in the dto
   @Post()
-  createPost(@Body() body: CreateTaskDto): BlogPost {
-    return this.postsService.createPost(body);
+  async createPost(@Body() body: CreateTaskDto): Promise<BlogPostModel> {
+    const createdPost = await this.postsService.createPost(body);
+    return createdPost;
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-post.dto';
 import { BlogPost } from './entities/blog-post.entity';
 
@@ -63,18 +63,18 @@ export class PostsService {
     return this.posts.find((post) => post.id === postId);
   }
 
-  createPost(post: CreateTaskDto): BlogPost {
-    const { imageUrl } = post;
-    const newPost = {
-      ...post,
-      id: Date.now(),
-      imageUrl: imageUrl
-        ? imageUrl
-        : 'https://images.unsplash.com/photo-1494256997604-768d1f608cac?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1101&q=80',
-      likeCounter: 0,
-    };
+  createPost(post: CreateTaskDto): Promise<BlogPostModel> {
+    let { imageUrl } = post;
+    imageUrl = imageUrl
+      ? imageUrl
+      : 'https://images.unsplash.com/photo-1494256997604-768d1f608cac?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1101&q=80';
 
-    this.posts.push(newPost);
-    return newPost;
+    post.imageUrl = imageUrl;
+    const newBlogPost = new this.blogPostModel({
+      ...post,
+      likeCounter: 0,
+    });
+
+    return newBlogPost.save();
   }
 }
