@@ -6,7 +6,6 @@ import {
   Post,
   Query,
   NotFoundException,
-  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -18,8 +17,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateTaskDto } from './dto/create-post.dto';
-import { BlogPost } from './entities/blog-post.entity';
-import { BlogPost as BlogPostModel } from './schemas/post.schema';
+import { BlogPost } from './schemas/post.schema';
 import { PostsService } from './posts.service';
 
 @ApiTags('Posts')
@@ -40,7 +38,7 @@ export class PostsController {
   @ApiInternalServerErrorResponse() // if the id is not the correct format
   @ApiNotFoundResponse() // if the id does not belong to a user
   @Get(':id')
-  async getPostById(@Param('id') id: string): Promise<BlogPostModel> {
+  async getPostById(@Param('id') id: string): Promise<BlogPost> {
     const post = await this.postsService.findById(id);
 
     if (!post) throw new NotFoundException();
@@ -51,7 +49,7 @@ export class PostsController {
   @ApiCreatedResponse({ type: BlogPost })
   @ApiBadRequestResponse() // its possible to get a bad responce because we added validation in the dto
   @Post()
-  createPost(@Body() body: CreateTaskDto): Promise<BlogPostModel> {
+  createPost(@Body() body: CreateTaskDto): Promise<BlogPost> {
     return this.postsService.createPost(body);
   }
 }

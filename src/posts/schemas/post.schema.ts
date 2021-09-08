@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsUrl } from 'class-validator';
 import { Document } from 'mongoose';
 
 export type BlogPostDocument = BlogPost & Document;

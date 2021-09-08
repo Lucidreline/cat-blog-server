@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-post.dto';
-import { BlogPost } from './entities/blog-post.entity';
 
 // mongoose
 import { Model } from 'mongoose';
