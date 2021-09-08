@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-post.dto';
 import { BlogPost } from './entities/blog-post.entity';
 
@@ -60,8 +64,8 @@ export class PostsService {
     return allBlogPosts;
   }
 
-  findById(postId: number): BlogPost {
-    return this.posts.find((post) => post.id === postId);
+  findById(postId: string): Promise<BlogPostModel> {
+    return this.blogPostModel.findById(postId).exec();
   }
 
   createPost(post: CreateTaskDto): Promise<BlogPostModel> {

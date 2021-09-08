@@ -11,6 +11,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiQuery,
@@ -36,10 +37,11 @@ export class PostsController {
   }
 
   @ApiOkResponse({ type: BlogPost })
-  @ApiNotFoundResponse()
+  @ApiInternalServerErrorResponse() // if the id is not the correct format
+  @ApiNotFoundResponse() // if the id does not belong to a user
   @Get(':id')
-  getPostById(@Param('id', ParseIntPipe) id: number): BlogPost {
-    const post = this.postsService.findById(id);
+  async getPostById(@Param('id') id: string): Promise<BlogPostModel> {
+    const post = await this.postsService.findById(id);
 
     if (!post) throw new NotFoundException();
 
