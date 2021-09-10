@@ -13,7 +13,10 @@ export class UsersService {
     return this.userModel.findOne({ username }).exec();
   }
 
-  // registerUser(user: CreateUserDto) {}
+  async createUser(user: CreateUserDto) {
+    const newUser = new this.userModel(user);
+    return await newUser.save();
+  }
 
   // loginUser(user: CreateUserDto) {}
 

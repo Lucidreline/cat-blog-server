@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/users/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -10,8 +9,12 @@ export class AuthService {
     const user = await this.usersService.findOne(username);
 
     if (user && user.password === password) {
-      const { password, ...rest } = user;
-      return rest; // returns everything but the password
+      // Had to jump through this loop hole to remove passwords from being returned
+      const stringUser = JSON.stringify(user);
+      const newJsonUser = JSON.parse(stringUser);
+      delete newJsonUser.password;
+
+      return newJsonUser;
     }
 
     return null;
