@@ -9,11 +9,15 @@ import { User, UserDocument } from './schemas/user.schema';
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  registerUser(user: CreateUserDto) {}
+  async findOne(username: string): Promise<User> {
+    return this.userModel.findOne({ username }).exec();
+  }
 
-  loginUser(user: CreateUserDto) {}
+  // registerUser(user: CreateUserDto) {}
 
-  updateUser(updateUser: UpdateUserDto) {}
+  // loginUser(user: CreateUserDto) {}
 
-  deleteUser(userId: string): Promise<User> {}
+  // updateUser(updateUser: UpdateUserDto) {}
+
+  // deleteUser(userId: string): Promise<User> {}
 }
