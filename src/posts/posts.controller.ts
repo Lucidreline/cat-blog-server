@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Patch,
   Delete,
+  Request,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -52,8 +53,11 @@ export class PostsController {
   @ApiCreatedResponse({ type: BlogPost })
   @ApiBadRequestResponse() // its possible to get a bad responce because we added validation in the dto
   @Post()
-  async createPost(@Body() body: CreatePostDto): Promise<BlogPost> {
-    return await this.postsService.createPost(body);
+  async createPost(
+    @Body() body: CreatePostDto,
+    @Request() req,
+  ): Promise<BlogPost> {
+    return await this.postsService.createPost(body, req.user._id);
   }
 
   @ApiCreatedResponse({ type: BlogPost })

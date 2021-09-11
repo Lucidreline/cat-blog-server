@@ -9,12 +9,14 @@ import {
   BlogPostDocument,
 } from './schemas/post.schema';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectModel(BlogPostModel.name)
     private blogPostModel: Model<BlogPostDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async findAll(query?: string): Promise<BlogPostModel[]> {
@@ -36,18 +38,31 @@ export class PostsService {
     return this.blogPostModel.findById(postId).exec();
   }
 
-  createPost(post: CreatePostDto): Promise<BlogPostModel> {
+  async createPost(
+    post: CreatePostDto,
+    userId: string,
+  ): Promise<BlogPostModel> {
     const { imageUrl } = post;
 
     const defaultImageUrl =
       'https://images.unsplash.com/photo-1494256997604-768d1f608cac?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1101&q=80';
+
+    const currentUser = await this.userModel.findById(userId);
+
     const newBlogPost = new this.blogPostModel({
       ...post,
       likeCounter: 0,
       imageUrl: imageUrl ? imageUrl : defaultImageUrl,
+      authorId: currentUser._id,
+      authorUsername: currentUser.username,
     });
 
-    return newBlogPost.save();
+    const createdBlogPost = await newBlogPost.save();
+
+    currentUser.blogPosts.push(createdBlogPost._id);
+    await currentUser.save();
+
+    return createdBlogPost;
   }
 
   updatePost(updatePost: UpdatePostDto): Promise<BlogPostDocument> {
