@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Request,
+  Response,
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
@@ -21,14 +22,29 @@ export class UsersController {
     return req.user;
   }
 
+  @UseGuards(AuthenticatedGuard)
+  @Get('logout')
+  logout(@Request() req) {
+    const currentUser = req.user;
+    req.logout();
+    return currentUser;
+  }
+
   @Post('register')
-  register(@Body() user: User): any {
-    return this.usersService.createUser(user);
+  async register(@Body() user: User, @Request() req, @Response() res) {
+    const newUser = await this.usersService.createUser(user);
+
+    req.login(newUser, () => {
+      const stringUser = JSON.stringify(req.user); // remove password before returning user
+      const newJsonUser = JSON.parse(stringUser);
+      delete newJsonUser.password;
+      res.json(newJsonUser);
+    });
   }
 
   @UseGuards(AuthenticatedGuard)
   @Get('protected')
-  privateRoute() {
-    return { msg: "You've made it in son." };
+  privateRoute(@Request() req) {
+    return { msg: `Welcome ${req.user.username}` };
   }
 }
