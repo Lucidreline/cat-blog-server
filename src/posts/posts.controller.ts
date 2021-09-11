@@ -9,6 +9,7 @@ import {
   Patch,
   Delete,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -23,6 +24,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { BlogPost } from './schemas/post.schema';
 import { PostsService } from './posts.service';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -50,6 +52,7 @@ export class PostsController {
     return post;
   }
 
+  @UseGuards(AuthenticatedGuard)
   @ApiCreatedResponse({ type: BlogPost })
   @ApiBadRequestResponse() // its possible to get a bad responce because we added validation in the dto
   @Post()
