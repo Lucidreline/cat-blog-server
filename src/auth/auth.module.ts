@@ -6,13 +6,14 @@ import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
+import { SessionSerializer } from './session.serializer';
 
 @Module({
   imports: [
     UsersModule,
-    PassportModule,
+    PassportModule.register({ session: true }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
-  providers: [AuthService, LocalStrategy, UsersService],
+  providers: [AuthService, LocalStrategy, UsersService, SessionSerializer],
 })
 export class AuthModule {}

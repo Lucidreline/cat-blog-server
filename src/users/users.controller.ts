@@ -6,6 +6,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
@@ -25,6 +26,7 @@ export class UsersController {
     return this.usersService.createUser(user);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get('protected')
   privateRoute() {
     return { msg: "You've made it in son." };
