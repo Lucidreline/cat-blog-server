@@ -15,6 +15,7 @@ import {
 } from './schemas/post.schema';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 
 @Injectable()
 export class PostsService {
@@ -126,5 +127,24 @@ export class PostsService {
   async userOwnsPost(postId: string, userId: string): Promise<boolean> {
     const blogPost = await this.blogPostModel.findById(postId);
     return String(blogPost.author) == userId;
+  }
+
+  async likePost(postId: string, user: UpdateUserDto): Promise<BlogPostModel> {
+    // get post model
+    const blogPost = await this.blogPostModel.findById(postId);
+
+    // add post to user model
+    user.likedBlogPosts.push(blogPost);
+
+    // save user
+    const updatedUser = await this.userModel.findByIdAndUpdate(user._id, user, {
+      new: true,
+    });
+
+    // add user to post model (if not already there)
+    blogPost.usersLiked.push(updatedUser);
+
+    // save and return post
+    return blogPost.save();
   }
 }
