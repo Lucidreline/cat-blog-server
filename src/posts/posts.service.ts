@@ -10,6 +10,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { Model, Types as mongooseTypes } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import {
+  BlogPost,
   BlogPost as BlogPostModel,
   BlogPostDocument,
 } from './schemas/post.schema';
@@ -131,8 +132,13 @@ export class PostsService {
 
   async likePost(postId: string, user: UpdateUserDto): Promise<BlogPostModel> {
     try {
-      // get post model
+      // check if post exsists
       const blogPost = await this.blogPostModel.findById(postId);
+      if (!BlogPost) throw new NotFoundException('Blog Post can not be found.');
+
+      // check if user has already liked post
+      if (this.userLikedPost(blogPost, user))
+        throw new BadRequestException('User has already liked this post.');
 
       // add post to user model
       user.likedBlogPosts.push(blogPost);
@@ -151,7 +157,13 @@ export class PostsService {
 
       // save and return post
       return blogPost.save();
-    } catch (error) {}
+    } catch (error) {
+      if (error instanceof UnauthorizedException)
+        throw new UnauthorizedException(error);
+      else if (error instanceof NotFoundException)
+        throw new NotFoundException(error);
+      else throw new BadRequestException(error);
+    }
   }
 
   async unlikePost(
@@ -184,5 +196,18 @@ export class PostsService {
       // save and return post
       return blogPost.save();
     } catch (error) {}
+  }
+
+  userLikedPost(post: BlogPost & { _id: any }, user: User): boolean {
+    user.likedBlogPosts.forEach((likedPost) => {
+      console.log(
+        `${JSON.stringify(likedPost._id)} ${String(post._id)} ${
+          String(likedPost) == String(post._id)
+        } `,
+      );
+      if (String(likedPost) == String(post._id)) return true;
+    });
+
+    return false;
   }
 }
