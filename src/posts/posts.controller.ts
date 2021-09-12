@@ -63,15 +63,17 @@ export class PostsController {
     return await this.postsService.createPost(body, req.user._id);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @ApiCreatedResponse({ type: BlogPost })
   @Patch()
   patchPost(@Body() body: UpdatePostDto): Promise<BlogPost> {
     return this.postsService.updatePost(body);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @ApiCreatedResponse({ type: BlogPost })
   @Delete(':id')
-  deletePostById(@Param('id') id: string): Promise<BlogPost> {
-    return this.postsService.deletePostById(id);
+  deletePostById(@Param('id') id: string, @Request() req): Promise<BlogPost> {
+    return this.postsService.deletePostById(id, req.user._id);
   }
 }

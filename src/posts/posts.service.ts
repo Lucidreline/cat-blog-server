@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 
 // mongoose
@@ -70,7 +75,37 @@ export class PostsService {
       .exec();
   }
 
-  deletePostById(postId: string): Promise<BlogPostModel> {
-    return this.blogPostModel.findByIdAndDelete(postId).exec();
+  async deletePostById(postId: string, userId: string): Promise<BlogPostModel> {
+    try {
+      // check if the post exsists
+      const currentPost = await this.blogPostModel.findById(postId);
+      if (!currentPost) throw new NotFoundException();
+
+      // check if the post belongs to the user
+      if (!(await this.userOwnsPost(currentPost._id, userId)))
+        throw new UnauthorizedException('User does not own BlogPost'); // throws error if the user doesn't own
+
+      // delete the post from the user's list and save user
+      const currentUser = await this.userModel.findById(userId);
+      currentUser.blogPosts = currentUser.blogPosts.filter(
+        (e) => String(e) != currentPost._id,
+      );
+      await currentUser.save();
+
+      // delete the post from the database
+
+      return await currentPost.remove();
+    } catch (error) {
+      if (error instanceof UnauthorizedException)
+        throw new UnauthorizedException(error);
+      else if (error instanceof NotFoundException)
+        throw new NotFoundException(error);
+      else throw new BadRequestException(error);
+    }
+  }
+
+  async userOwnsPost(postId: string, userId: string): Promise<boolean> {
+    const blogPost = await this.blogPostModel.findById(postId);
+    return String(blogPost.author) == userId;
   }
 }
