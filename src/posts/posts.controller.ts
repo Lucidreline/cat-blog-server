@@ -79,6 +79,13 @@ export class PostsController {
 
   @UseGuards(AuthenticatedGuard)
   @ApiCreatedResponse({ type: BlogPost })
+  @Patch('/unlike/:id')
+  unlikePost(@Param('id') id: string, @Request() req): Promise<BlogPost> {
+    return this.postsService.unlikePost(id, req.user);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @ApiCreatedResponse({ type: BlogPost })
   @Delete(':id')
   deletePostById(@Param('id') id: string, @Request() req): Promise<BlogPost> {
     return this.postsService.deletePostById(id, req.user._id);

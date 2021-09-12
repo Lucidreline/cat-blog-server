@@ -130,21 +130,59 @@ export class PostsService {
   }
 
   async likePost(postId: string, user: UpdateUserDto): Promise<BlogPostModel> {
-    // get post model
-    const blogPost = await this.blogPostModel.findById(postId);
+    try {
+      // get post model
+      const blogPost = await this.blogPostModel.findById(postId);
 
-    // add post to user model
-    user.likedBlogPosts.push(blogPost);
+      // add post to user model
+      user.likedBlogPosts.push(blogPost);
 
-    // save user
-    const updatedUser = await this.userModel.findByIdAndUpdate(user._id, user, {
-      new: true,
-    });
+      // save user
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        user._id,
+        user,
+        {
+          new: true,
+        },
+      );
 
-    // add user to post model (if not already there)
-    blogPost.usersLiked.push(updatedUser);
+      // add user to post model (if not already there)
+      blogPost.usersLiked.push(updatedUser);
 
-    // save and return post
-    return blogPost.save();
+      // save and return post
+      return blogPost.save();
+    } catch (error) {}
+  }
+
+  async unlikePost(
+    postId: string,
+    user: UpdateUserDto,
+  ): Promise<BlogPostModel> {
+    try {
+      // get post model
+      const blogPost = await this.blogPostModel.findById(postId);
+
+      // remove post from user model
+      user.likedBlogPosts = user.likedBlogPosts.filter(
+        (e) => String(e) != postId,
+      );
+
+      // save user and update
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        user._id,
+        user,
+        {
+          new: true,
+        },
+      );
+
+      // remove user from post model (if already there)
+      blogPost.usersLiked = blogPost.usersLiked.filter(
+        (e) => String(e) != updatedUser._id,
+      );
+
+      // save and return post
+      return blogPost.save();
+    } catch (error) {}
   }
 }
