@@ -19,13 +19,11 @@ export class BlogPost {
   likeCounter: number;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   })
-  authorId: User;
-
-  @Prop({ required: true })
-  authorUsername: string;
+  author: User;
 }
 
 export const BlogPostSchema = SchemaFactory.createForClass(BlogPost);

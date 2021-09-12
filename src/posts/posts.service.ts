@@ -53,8 +53,7 @@ export class PostsService {
       ...post,
       likeCounter: 0,
       imageUrl: imageUrl ? imageUrl : defaultImageUrl,
-      authorId: currentUser._id,
-      authorUsername: currentUser.username,
+      author: currentUser._id,
     });
 
     const createdBlogPost = await newBlogPost.save();

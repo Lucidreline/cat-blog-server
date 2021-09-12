@@ -15,7 +15,4 @@ export class CreatePostDto {
 
   @ApiProperty()
   authorId: User;
-
-  @ApiProperty()
-  authorUsername: string;
 }
