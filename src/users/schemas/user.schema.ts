@@ -12,8 +12,19 @@ export class User {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }] })
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }],
+    required: true,
+    default: [],
+  })
   blogPosts: BlogPost[];
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }],
+    required: true,
+    default: [],
+  })
+  likedBlogPosts: BlogPost[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

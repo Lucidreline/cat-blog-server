@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from 'src/users/schemas/user.schema';
 
 export class UpdatePostDto {
   @ApiProperty()
@@ -11,7 +12,7 @@ export class UpdatePostDto {
   textBody: string;
 
   @ApiProperty()
-  likeCounter: number;
+  usersLiked: User[];
 
   @ApiProperty({ required: false })
   imageUrl?: string;

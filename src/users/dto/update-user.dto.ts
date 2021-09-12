@@ -10,4 +10,7 @@ export class UpdateUserDto {
 
   @ApiProperty()
   blogPosts: BlogPost[];
+
+  @ApiProperty()
+  likedBlogPosts: BlogPost[];
 }

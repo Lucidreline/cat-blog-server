@@ -56,7 +56,6 @@ export class PostsService {
 
     const newBlogPost = new this.blogPostModel({
       ...post,
-      likeCounter: 0,
       imageUrl: imageUrl ? imageUrl : defaultImageUrl,
       author: currentUser._id,
     });
