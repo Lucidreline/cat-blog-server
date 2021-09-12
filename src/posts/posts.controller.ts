@@ -66,8 +66,8 @@ export class PostsController {
   @UseGuards(AuthenticatedGuard)
   @ApiCreatedResponse({ type: BlogPost })
   @Patch()
-  patchPost(@Body() body: UpdatePostDto): Promise<BlogPost> {
-    return this.postsService.updatePost(body);
+  patchPost(@Body() body: UpdatePostDto, @Request() req): Promise<BlogPost> {
+    return this.postsService.updatePost(body, req.user._id);
   }
 
   @UseGuards(AuthenticatedGuard)

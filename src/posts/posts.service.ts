@@ -69,10 +69,30 @@ export class PostsService {
     return createdBlogPost;
   }
 
-  updatePost(updatePost: UpdatePostDto): Promise<BlogPostDocument> {
-    return this.blogPostModel
-      .findByIdAndUpdate(updatePost._id, updatePost, { new: true }) // new: true returns the updated blog
-      .exec();
+  async updatePost(
+    updatePost: UpdatePostDto,
+    userId: string,
+  ): Promise<BlogPostDocument> {
+    try {
+      // check if the blog post even exsists
+      const oldBlogPost = await this.blogPostModel.findById(updatePost._id);
+      if (!oldBlogPost)
+        throw new BadRequestException('Original BlogPost does not exsist.');
+
+      // check if the blog post belongs to the current user
+      if (!(await this.userOwnsPost(oldBlogPost._id, userId)))
+        throw new UnauthorizedException('User does not own BlogPost');
+
+      return this.blogPostModel
+        .findByIdAndUpdate(updatePost._id, updatePost, { new: true }) // new: true returns the updated blog
+        .exec();
+    } catch (error) {
+      if (error instanceof UnauthorizedException)
+        throw new UnauthorizedException(error);
+      else if (error instanceof NotFoundException)
+        throw new NotFoundException(error);
+      else throw new BadRequestException(error);
+    }
   }
 
   async deletePostById(postId: string, userId: string): Promise<BlogPostModel> {
