@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Request,
   Response,
@@ -15,6 +16,11 @@ import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get(':id')
+  getUserById(@Param('id') id: string) {
+    return this.usersService.getUserById(id);
+  }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')

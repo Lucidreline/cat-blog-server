@@ -9,6 +9,10 @@ import { User, UserDocument } from './schemas/user.schema';
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
+  async getUserById(id: string): Promise<User> {
+    return this.userModel.findById(id).exec();
+  }
+
   async findOne(username: string): Promise<User> {
     return this.userModel.findOne({ username }).exec();
   }
