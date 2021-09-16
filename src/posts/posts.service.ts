@@ -64,7 +64,7 @@ export class PostsService {
 
     const createdBlogPost = await newBlogPost.save();
 
-    currentUser.blogPosts.push(createdBlogPost._id);
+    currentUser.blogPosts.push(createdBlogPost);
     await currentUser.save();
 
     return createdBlogPost;
@@ -141,7 +141,7 @@ export class PostsService {
         throw new BadRequestException('User has already liked this post.');
 
       // add post to user model
-      user.likedBlogPosts.push(blogPost);
+      user.likedBlogPosts.push(blogPost._id);
 
       // save user
       const updatedUser = await this.userModel.findByIdAndUpdate(
@@ -198,7 +198,7 @@ export class PostsService {
     } catch (error) {}
   }
 
-  userLikedPost(post: BlogPost & { _id: any }, user: User): boolean {
+  userLikedPost(post: BlogPost & { _id: any }, user: any): boolean {
     user.likedBlogPosts.forEach((likedPost) => {
       console.log(
         `${JSON.stringify(likedPost._id)} ${String(post._id)} ${
