@@ -4,13 +4,18 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 import * as session from 'express-session';
+import * as redis from 'redis';
+import * as connectRedis from 'connect-redis';
 import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const RedisStore = connectRedis(session);
+  const redisClient = redis.createClient({ port: 6379, host: 'localhost' });
 
   app.use(
     session({
+      store: new RedisStore({ client: redisClient }),
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
