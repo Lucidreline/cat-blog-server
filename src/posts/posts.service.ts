@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -130,84 +131,116 @@ export class PostsService {
     return String(blogPost.author) == userId;
   }
 
-  async likePost(postId: string, user: UpdateUserDto): Promise<BlogPostModel> {
-    try {
-      // check if post exsists
-      const blogPost = await this.blogPostModel.findById(postId);
-      if (!BlogPost) throw new NotFoundException('Blog Post can not be found.');
+  async likePost(postId: string, userId: string): Promise<BlogPostModel> {
+    // check if postID is valid
+    if (!mongooseTypes.ObjectId.isValid(postId))
+      throw new BadRequestException('Post ID is not valid.');
 
-      // check if user has already liked post
-      if (this.userLikedPost(blogPost, user))
-        throw new BadRequestException('User has already liked this post.');
+    // find the blog post and extract all of the likes (which are user IDs)
+    const foundPost = await this.blogPostModel.findById(postId);
 
-      // add post to user model
-      user.likedBlogPosts.push(blogPost._id);
+    // check if the post even exsists
+    if (!foundPost) throw new NotFoundException('Post does not exsist');
 
-      // save user
-      const updatedUser = await this.userModel.findByIdAndUpdate(
-        user._id,
-        user,
-        {
-          new: true,
-        },
-      );
+    // find the user by ID
+    const foundUser = await this.userModel.findById(userId);
 
-      // add user to post model (if not already there)
-      blogPost.usersLiked.push(updatedUser);
+    // make sure that the userID is not in the blog post likes
+    if (foundPost.usersLiked.includes(foundUser._id))
+      throw new ForbiddenException('User has already liked post');
 
-      // save and return post
-      return blogPost.save();
-    } catch (error) {
-      if (error instanceof UnauthorizedException)
-        throw new UnauthorizedException(error);
-      else if (error instanceof NotFoundException)
-        throw new NotFoundException(error);
-      else throw new BadRequestException(error);
-    }
+    // add userID to the post likes
+    foundPost.usersLiked.push(foundUser._id);
+
+    // add post to the user likes
+    foundUser.likedBlogPosts.push(foundPost._id);
+
+    // save both
+    await foundPost.save();
+    await foundUser.save();
+
+    // return post
+    return foundPost; // change this
   }
 
-  async unlikePost(
-    postId: string,
-    user: UpdateUserDto,
-  ): Promise<BlogPostModel> {
-    try {
-      // get post model
-      const blogPost = await this.blogPostModel.findById(postId);
+  // async likePost(postId: string, user: UpdateUserDto): Promise<BlogPostModel> {
+  //   try {
+  //     // check if post exsists
+  //     const blogPost = await this.blogPostModel.findById(postId);
+  //     if (!BlogPost) throw new NotFoundException('Blog Post can not be found.');
 
-      // remove post from user model
-      user.likedBlogPosts = user.likedBlogPosts.filter(
-        (e) => String(e) != postId,
-      );
+  //     // check if user has already liked post
+  //     if (this.userLikedPost(blogPost, user))
+  //       throw new BadRequestException('User has already liked this post.');
 
-      // save user and update
-      const updatedUser = await this.userModel.findByIdAndUpdate(
-        user._id,
-        user,
-        {
-          new: true,
-        },
-      );
+  //     // add post to user model
+  //     user.likedBlogPosts.push(blogPost._id);
 
-      // remove user from post model (if already there)
-      blogPost.usersLiked = blogPost.usersLiked.filter(
-        (e) => String(e) != updatedUser._id,
-      );
+  //     // save user
+  //     const updatedUser = await this.userModel.findByIdAndUpdate(
+  //       user._id,
+  //       user,
+  //       {
+  //         new: true,
+  //       },
+  //     );
 
-      // save and return post
-      return blogPost.save();
-    } catch (error) {}
-  }
+  //     // add user to post model (if not already there)
+  //     blogPost.usersLiked.push(updatedUser);
 
-  userLikedPost(post: BlogPost & { _id: any }, user: any): boolean {
-    user.likedBlogPosts.forEach((likedPost) => {
-      console.log(
-        `${JSON.stringify(likedPost._id)} ${String(post._id)} ${
-          String(likedPost) == String(post._id)
-        } `,
-      );
-      if (String(likedPost) == String(post._id)) return true;
-    });
+  //     // save and return post
+  //     return blogPost.save();
+  //   } catch (error) {
+  //     if (error instanceof UnauthorizedException)
+  //       throw new UnauthorizedException(error);
+  //     else if (error instanceof NotFoundException)
+  //       throw new NotFoundException(error);
+  //     else throw new BadRequestException(error);
+  //   }
+  // }
 
-    return false;
-  }
+  // async unlikePost(
+  //   postId: string,
+  //   user: UpdateUserDto,
+  // ): Promise<BlogPostModel> {
+  //   try {
+  //     // get post model
+  //     const blogPost = await this.blogPostModel.findById(postId);
+
+  //     // remove post from user model
+  //     user.likedBlogPosts = user.likedBlogPosts.filter(
+  //       (e) => String(e) != postId,
+  //     );
+
+  //     // save user and update
+  //     const updatedUser = await this.userModel.findByIdAndUpdate(
+  //       user._id,
+  //       user,
+  //       {
+  //         new: true,
+  //       },
+  //     );
+
+  //     // remove user from post model (if already there)
+  //     blogPost.usersLiked = blogPost.usersLiked.filter(
+  //       (e) => String(e) != updatedUser._id,
+  //     );
+
+  //     // save and return post
+  //     return blogPost.save();
+  //   } catch (error) {}
+  // }
+
+  // userLikedPost(post: BlogPost & { _id: any }, user: any): boolean {
+  //   user.likedBlogPosts.forEach((likedPost) => {
+  //     console.log(
+  //       `${JSON.stringify(likedPost._id)} ${String(post._id)} ${
+  //         String(likedPost) == String(post._id)
+  //       } `,
+  //     );
+  //     if (String(likedPost) == String(post._id)) return true;
+  //   });
+
+  //   return false;
+  // }
 }
