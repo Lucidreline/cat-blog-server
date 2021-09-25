@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -8,7 +9,7 @@ export class AuthService {
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.usersService.findOne(username);
 
-    if (user && user.password === password) {
+    if (user && bcrypt.compare(password, user.password)) {
       // Had to jump through this loop hole to remove passwords from being returned
       const stringUser = JSON.stringify(user);
       const newJsonUser = JSON.parse(stringUser);
