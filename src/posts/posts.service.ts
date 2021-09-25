@@ -61,6 +61,7 @@ export class PostsService {
       ...post,
       imageUrl: imageUrl ? imageUrl : defaultImageUrl,
       author: currentUser._id,
+      authorUsername: currentUser.username,
     });
 
     const createdBlogPost = await newBlogPost.save();
