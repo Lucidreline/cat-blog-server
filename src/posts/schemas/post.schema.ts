@@ -22,7 +22,7 @@ export class BlogPost {
   })
   author: User;
 
-  @Prop()
+  @Prop({ required: true })
   authorUsername: string;
 
   @Prop({
