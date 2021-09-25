@@ -14,6 +14,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -71,18 +72,24 @@ export class PostsController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @ApiBadRequestResponse()
+  @ApiNotFoundResponse()
+  @ApiForbiddenResponse()
   @ApiCreatedResponse({ type: BlogPost })
   @Patch('/like/:id')
   likePost(@Param('id') id: string, @Request() req): Promise<BlogPost> {
     return this.postsService.likePost(id, req.user._id);
   }
 
-  // @UseGuards(AuthenticatedGuard)
-  // @ApiCreatedResponse({ type: BlogPost })
-  // @Patch('/unlike/:id')
-  // unlikePost(@Param('id') id: string, @Request() req): Promise<BlogPost> {
-  //   return this.postsService.unlikePost(id, req.user);
-  // }
+  @UseGuards(AuthenticatedGuard)
+  @ApiBadRequestResponse()
+  @ApiNotFoundResponse()
+  @ApiForbiddenResponse()
+  @ApiCreatedResponse({ type: BlogPost })
+  @Patch('/unlike/:id')
+  unlikePost(@Param('id') id: string, @Request() req): Promise<BlogPost> {
+    return this.postsService.unlikePost(id, req.user._id);
+  }
 
   @UseGuards(AuthenticatedGuard)
   @ApiCreatedResponse({ type: BlogPost })

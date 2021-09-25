@@ -163,84 +163,36 @@ export class PostsService {
     return foundPost; // change this
   }
 
-  // async likePost(postId: string, user: UpdateUserDto): Promise<BlogPostModel> {
-  //   try {
-  //     // check if post exsists
-  //     const blogPost = await this.blogPostModel.findById(postId);
-  //     if (!BlogPost) throw new NotFoundException('Blog Post can not be found.');
+  async unlikePost(postId: string, userId: string): Promise<BlogPostModel> {
+    // check if the post id is valid
+    if (!mongooseTypes.ObjectId.isValid(postId))
+      throw new BadRequestException('Post ID is not valid.');
 
-  //     // check if user has already liked post
-  //     if (this.userLikedPost(blogPost, user))
-  //       throw new BadRequestException('User has already liked this post.');
+    // find the post by its id
+    const foundPost = await this.blogPostModel.findById(postId);
 
-  //     // add post to user model
-  //     user.likedBlogPosts.push(blogPost._id);
+    // find the user by its id
+    const foundUser = await this.userModel.findById(userId);
 
-  //     // save user
-  //     const updatedUser = await this.userModel.findByIdAndUpdate(
-  //       user._id,
-  //       user,
-  //       {
-  //         new: true,
-  //       },
-  //     );
+    // make sure that user exsists on the post's user liked list
+    if (!foundPost.usersLiked.includes(foundUser._id))
+      throw new ForbiddenException('User has not already liked the blog post.');
 
-  //     // add user to post model (if not already there)
-  //     blogPost.usersLiked.push(updatedUser);
+    // remove user id from that list
+    foundPost.usersLiked = foundPost.usersLiked.filter(
+      (e) => e != foundUser._id,
+    );
 
-  //     // save and return post
-  //     return blogPost.save();
-  //   } catch (error) {
-  //     if (error instanceof UnauthorizedException)
-  //       throw new UnauthorizedException(error);
-  //     else if (error instanceof NotFoundException)
-  //       throw new NotFoundException(error);
-  //     else throw new BadRequestException(error);
-  //   }
-  // }
+    // remove postID from the user's liked list
+    foundUser.likedBlogPosts = foundUser.likedBlogPosts.filter(
+      (e) => e != foundUser._id,
+    );
 
-  // async unlikePost(
-  //   postId: string,
-  //   user: UpdateUserDto,
-  // ): Promise<BlogPostModel> {
-  //   try {
-  //     // get post model
-  //     const blogPost = await this.blogPostModel.findById(postId);
+    // save both
+    await foundPost.save();
+    await foundUser.save();
 
-  //     // remove post from user model
-  //     user.likedBlogPosts = user.likedBlogPosts.filter(
-  //       (e) => String(e) != postId,
-  //     );
-
-  //     // save user and update
-  //     const updatedUser = await this.userModel.findByIdAndUpdate(
-  //       user._id,
-  //       user,
-  //       {
-  //         new: true,
-  //       },
-  //     );
-
-  //     // remove user from post model (if already there)
-  //     blogPost.usersLiked = blogPost.usersLiked.filter(
-  //       (e) => String(e) != updatedUser._id,
-  //     );
-
-  //     // save and return post
-  //     return blogPost.save();
-  //   } catch (error) {}
-  // }
-
-  // userLikedPost(post: BlogPost & { _id: any }, user: any): boolean {
-  //   user.likedBlogPosts.forEach((likedPost) => {
-  //     console.log(
-  //       `${JSON.stringify(likedPost._id)} ${String(post._id)} ${
-  //         String(likedPost) == String(post._id)
-  //       } `,
-  //     );
-  //     if (String(likedPost) == String(post._id)) return true;
-  //   });
-
-  //   return false;
-  // }
+    // return updated post
+    return foundPost;
+  }
 }
