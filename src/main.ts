@@ -11,11 +11,12 @@ import * as passport from 'passport';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const RedisStore = connectRedis(session);
-  const redisClient = redis.createClient({ port: 6379, host: 'localhost' });
+  //const redisClient = redis.createClient({ port: 6379, host: 'localhost' });
+
 
   app.use(
     session({
-      store: new RedisStore({ client: redisClient }),
+      //store: new RedisStore({ client: redisClient }),
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
