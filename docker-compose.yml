@@ -14,6 +14,11 @@ services:
       - NODE_ENV=development
     command: npm run start:dev
     restart: always
+  redis:
+    image: redis
+    container_name: cat-redis
+    ports:
+      - 6379:6379
   db:
     image: mongo
     container_name: cat-mongodb
