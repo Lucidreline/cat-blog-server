@@ -26,7 +26,6 @@ export class BlogPost {
   authorUsername: string;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }],
     required: true,
     default: [],
   })

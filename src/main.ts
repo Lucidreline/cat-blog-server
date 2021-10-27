@@ -13,7 +13,6 @@ async function bootstrap() {
   const RedisStore = connectRedis(session);
   const redisClient = redis.createClient({ port: 6379, host: 'cat-redis' });
 
-
   app.use(
     session({
       store: new RedisStore({ client: redisClient }),

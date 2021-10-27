@@ -13,15 +13,11 @@ export class User {
   password: string;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }],
-    required: true,
     default: [],
   })
   blogPosts: BlogPost[];
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }],
-    required: true,
     default: [],
   })
   likedBlogPosts: BlogPost[];
