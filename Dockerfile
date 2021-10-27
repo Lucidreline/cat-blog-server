@@ -1,13 +1,13 @@
-FROM node:15
+FROM node:15 AS production
 
 WORKDIR /app
 
-COPY package.json .
+COPY package*.json ./
 
-RUN npm i
+RUN npm i --only=prod
 
-RUN apt-get update 
+COPY ./ ./
 
-COPY . ./
+RUN npm run build
 
-CMD ["node", "server.js"]
+CMD ["node", "dist/main"]
