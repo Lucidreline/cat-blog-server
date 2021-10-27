@@ -1,35 +1,12 @@
-version: '3.8'
+version: '3'
 services:
   node-app:
     build:
       context: .
       dockerfile: 'Dockerfile.dev'
-    container_name: cat-blog-server
-    ports:
-      - '3000:3000'
     volumes:
       - ./:/app
       - /app/node_modules
-    depends_on:
-      - 'db'
     environment:
       - NODE_ENV=development
     command: npm run start:dev
-    restart: always
-  redis:
-    image: redis
-    container_name: cat-redis
-    ports:
-      - 6379:6379
-  db:
-    image: mongo
-    container_name: cat-mongodb
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
-    volumes:
-      - mongo-db:/data/catDb
-    restart: always
-
-volumes:
-  mongo-db:

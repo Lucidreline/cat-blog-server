@@ -1,0 +1,9 @@
+version: '3'
+services:
+  node-app:
+    build:
+      context: .
+      dockerfile: 'Dockerfile'
+    environment:
+      - NODE_ENV=production
+    command: npm run start:prod

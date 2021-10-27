@@ -1,17 +1,11 @@
-version: '3.8'
+version: '3'
 services:
   node-app:
-    build:
-      context: .
-      dockerfile: 'Dockerfile'
     container_name: cat-blog-server
     ports:
       - '3000:3000'
     depends_on:
       - 'db'
-    environment:
-      - NODE_ENV=development
-    command: npm run start:prod
     restart: always
   redis:
     image: redis
