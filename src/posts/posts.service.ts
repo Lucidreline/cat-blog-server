@@ -66,7 +66,7 @@ export class PostsService {
 
     const createdBlogPost = await newBlogPost.save();
 
-    currentUser.blogPosts.push(createdBlogPost);
+    currentUser.blogPosts.push(createdBlogPost._id);
     await currentUser.save();
 
     return createdBlogPost;
@@ -181,12 +181,12 @@ export class PostsService {
 
     // remove user id from that list
     foundPost.usersLiked = foundPost.usersLiked.filter(
-      (e) => e != foundUser._id,
+      (e) => e.toString() !== foundUser._id.toString(),
     );
 
     // remove postID from the user's liked list
     foundUser.likedBlogPosts = foundUser.likedBlogPosts.filter(
-      (e) => e != foundUser._id,
+      (e) => e.toString() != foundPost._id.toString(),
     );
 
     // save both
