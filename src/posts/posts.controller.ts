@@ -78,17 +78,7 @@ export class PostsController {
   @ApiCreatedResponse({ type: BlogPost })
   @Patch('/like/:id')
   likePost(@Param('id') id: string, @Request() req): Promise<BlogPost> {
-    return this.postsService.likePost(id, req.user._id);
-  }
-
-  @UseGuards(AuthenticatedGuard)
-  @ApiBadRequestResponse()
-  @ApiNotFoundResponse()
-  @ApiForbiddenResponse()
-  @ApiCreatedResponse({ type: BlogPost })
-  @Patch('/unlike/:id')
-  unlikePost(@Param('id') id: string, @Request() req): Promise<BlogPost> {
-    return this.postsService.unlikePost(id, req.user._id);
+    return this.postsService.handleLike(id, req.user._id);
   }
 
   @UseGuards(AuthenticatedGuard)
