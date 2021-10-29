@@ -9,7 +9,15 @@ import * as connectRedis from 'connect-redis';
 import * as passport from 'passport';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: 'http://149.28.93.112:3006',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
+      credentials: true,
+    },
+  });
   const RedisStore = connectRedis(session);
   const redisClient = redis.createClient({ port: 6379, host: 'cat-redis' });
 
@@ -36,7 +44,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);
-  app.enableCors();
   await app.listen(3000);
 }
 bootstrap();
