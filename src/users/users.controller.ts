@@ -17,6 +17,14 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(AuthenticatedGuard)
+  @Get('logout')
+  logout(@Request() req) {
+    const currentUser = req.user;
+    req.logout();
+    return currentUser;
+  }
+
   @Get(':id')
   getUserById(@Param('id') id: string) {
     return this.usersService.getUserById(id);
@@ -26,14 +34,6 @@ export class UsersController {
   @Post('login')
   login(@Request() req): any {
     return req.user;
-  }
-
-  @UseGuards(AuthenticatedGuard)
-  @Get('logout')
-  logout(@Request() req) {
-    const currentUser = req.user;
-    req.logout();
-    return currentUser;
   }
 
   @Post('register')
@@ -46,11 +46,5 @@ export class UsersController {
       delete newJsonUser.password;
       res.json(newJsonUser);
     });
-  }
-
-  @UseGuards(AuthenticatedGuard)
-  @Get('protected')
-  privateRoute(@Request() req) {
-    return { msg: `Welcome ${req.user.username}` };
   }
 }
