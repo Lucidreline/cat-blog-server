@@ -17,6 +17,13 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('who-am-i')
+  whoAmI(@Request() req): Promise<User | null> {
+    const currentUser = req.user;
+    if (currentUser == undefined) return null;
+    else return currentUser;
+  }
+
   @UseGuards(AuthenticatedGuard)
   @Get('logout')
   logout(@Request() req) {
