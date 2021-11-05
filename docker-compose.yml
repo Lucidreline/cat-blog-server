@@ -13,7 +13,7 @@ services:
     ports:
       - 6379:6379
   db:
-    image: mongo
+    image: mongo:4.4.10
     container_name: cat-mongodb
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin

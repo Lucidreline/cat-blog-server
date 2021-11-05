@@ -5,7 +5,7 @@ import { BlogPost } from 'src/posts/schemas/post.schema';
 export type UserDocument = User & mongoose.Document;
 
 @Schema()
-export class User {
+export class User { 
   @Prop({ required: true, unique: true })
   username: string;
 
