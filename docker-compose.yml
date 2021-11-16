@@ -12,6 +12,7 @@ services:
     container_name: cat-redis
     ports:
       - 6379:6379
+    restart: always
   db:
     image: mongo:4.4.10
     container_name: cat-mongodb
